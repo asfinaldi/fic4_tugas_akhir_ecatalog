@@ -5,11 +5,10 @@ import 'package:platzi_fake_store_app/bloc/product/get_all_product/get_all_produ
 import 'package:platzi_fake_store_app/bloc/profile/profile_bloc.dart';
 import 'package:platzi_fake_store_app/data/datasources/auth_datasources.dart';
 import 'package:platzi_fake_store_app/data/datasources/product_datasources.dart';
-import 'package:platzi_fake_store_app/data/localsources/auth_local_storage.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/home_page.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/login_page.dart';
-import 'package:platzi_fake_store_app/presemtation/pages/register.page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:platzi_fake_store_app/presemtation/pages/register.page.dart';
 import 'bloc/register/register_bloc.dart';
 
 void main() {
@@ -29,7 +28,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -43,16 +41,22 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => ProfileBloc(AuthDatasource()),
         ),
-                BlocProvider(
+        BlocProvider(
           create: (context) => CreateProductBloc(ProductDatasources()),
         ),
-                        BlocProvider(
+        BlocProvider(
           create: (context) => GetAllProductBloc(ProductDatasources()),
         ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
+        initialRoute: LoginPage.routeName,
+        routes: {
+          LoginPage.routeName: (context) => const LoginPage(),
+          RegisterPage.routeName: (context) => const RegisterPage(),
+          HomePage.routeName: (context) => const HomePage(),
+        },
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,

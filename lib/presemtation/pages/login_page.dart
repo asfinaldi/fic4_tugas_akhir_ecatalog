@@ -7,6 +7,7 @@ import 'package:platzi_fake_store_app/presemtation/pages/home_page.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/register.page.dart';
 
 class LoginPage extends StatefulWidget {
+  static const String routeName = '/login-page';
   const LoginPage({super.key});
 
   @override
@@ -30,12 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   void isLogin() async {
     final isTokenExist = await AuthLocalStorage().isTokenExist();
     if (isTokenExist) {
-      Navigator.push(context, MaterialPageRoute(
-        builder: (context) {
-          return const HomePage();
-        },
-      ));
-    } 
+      Navigator.pushNamed(context, HomePage.routeName);
+    }
   }
 
   @override
@@ -45,11 +42,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  String? validationInput() {
+    if (emailController!.text.isEmpty || passwordController!.text.isEmpty) {
+      return 'name or email';
+    }
+    if (emailController!.text.length < 4 ||
+        passwordController!.text.length < 4) {
+      return 'to short';
+    }
+    if (!emailController!.text.contains('@')) {
+      return 'email no valid';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login App'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -82,11 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundColor: Colors.blue,
                       content: Text('succes register')));
                 }
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return const HomePage();
-                  },
-                ));
+                Navigator.pushNamed(context, HomePage.routeName);
               },
               builder: (context, state) {
                 if (state is LoginLoading) {
@@ -96,6 +103,16 @@ class _LoginPageState extends State<LoginPage> {
                 }
                 return ElevatedButton(
                   onPressed: () {
+                    final message = validationInput();
+                    if (message != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.blue,
+                          content: Text(message),
+                        ),
+                      );
+                      return;
+                    }
                     final requestModel = LoginModel(
                       email: emailController!.text,
                       password: passwordController!.text,
@@ -113,11 +130,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return const RegisterPage();
-                    },
-                  ));
+                  Navigator.pushNamed(context, RegisterPage.routeName);
                 },
                 child: const Text('Belum Punya Akun ? Register'))
           ],

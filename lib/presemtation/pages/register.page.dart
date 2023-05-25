@@ -6,6 +6,7 @@ import 'package:platzi_fake_store_app/presemtation/pages/home_page.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
+  static const String routeName = '/register-page';
   const RegisterPage({super.key});
 
   @override
@@ -33,11 +34,27 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  String? validationInput() {
+    if (nameController!.text.isEmpty ||
+        emailController!.text.isEmpty ||
+        passwordController!.text.isEmpty) {
+      return 'name or email or password is empty';
+    }
+    if (emailController!.text.length < 4 ||
+        passwordController!.text.length < 4) {
+      return 'To short, minimum 4 charackter';
+    }
+    if (!emailController!.text.contains('@')) {
+      return 'email no valid';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -77,11 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       backgroundColor: Colors.blue,
                       content:
                           Text('succes register with id : ${state.model.id}')));
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return const LoginPage();
-                    },
-                  ));
+                  Navigator.pushNamed(context, LoginPage.routeName);
                 }
               },
               builder: (context, state) {
@@ -92,6 +105,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 }
                 return ElevatedButton(
                   onPressed: () {
+                    final message = validationInput();
+                    if (message != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.blue,
+                          content: Text(message),
+                        ),
+                      );
+                      return;
+                    }
                     final requestModel = RegisterModel(
                       name: nameController!.text,
                       email: emailController!.text,
@@ -110,11 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) {
-                    return const LoginPage();
-                  },
-                ));
+                Navigator.pushNamed(context, LoginPage.routeName);
               },
               child: const Text('Sudah Punya akun ?'),
             ),
