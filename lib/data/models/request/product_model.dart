@@ -21,7 +21,9 @@ class ProductModel {
     required this.price,
     required this.description,
     this.categoryId = 1,
-    this.images = const ['https://placeimg.com/640/480/any'],
+    //required this.images,
+    this.images = const ["https://picsum.photos/640/640?r=2609"],
+
   });
 
   Map<String, dynamic> toMap() {

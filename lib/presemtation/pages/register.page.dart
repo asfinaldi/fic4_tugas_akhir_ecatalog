@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/register/register_bloc.dart';
 import 'package:platzi_fake_store_app/data/models/request/register_model.dart';
-import 'package:platzi_fake_store_app/presemtation/pages/home_page.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -42,102 +41,133 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     if (emailController!.text.length < 4 ||
         passwordController!.text.length < 4) {
-      return 'To short, minimum 4 charackter';
+      return 'to short, minimum 4 charackter';
     }
     if (!emailController!.text.contains('@')) {
       return 'email no valid';
     }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        title: const Text(
+          'Catalog Platzi Store',
+          style: TextStyle(color: Colors.white),
+        ),
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Name',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+              height: 100.0,
               ),
-              controller: nameController,
-            ),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Email',
+              Image.asset(
+                "assets/images/register.png",
+                width: 150.0,
+                height: 150.0,
+                //fit: BoxFit.fill,
               ),
-              controller: emailController,
-            ),
-            TextField(
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
+                controller: nameController,
+                style: const TextStyle(color: Colors.white),
               ),
-              controller: passwordController,
-            ),
-            const SizedBox(
-              height: 15.0,
-            ),
-            BlocConsumer<RegisterBloc, RegisterState>(
-              listener: (context, state) {
-                if (state is RegisterLoaded) {
-                  nameController!.clear();
-                  emailController!.clear();
-                  passwordController!.clear();
-                  //navigasi
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      backgroundColor: Colors.blue,
-                      content:
-                          Text('succes register with id : ${state.model.id}')));
-                  Navigator.pushNamed(context, LoginPage.routeName);
-                }
-              },
-              builder: (context, state) {
-                if (state is RegisterLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return ElevatedButton(
-                  onPressed: () {
-                    final message = validationInput();
-                    if (message != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.blue,
-                          content: Text(message),
-                        ),
-                      );
-                      return;
-                    }
-                    final requestModel = RegisterModel(
-                      name: nameController!.text,
-                      email: emailController!.text,
-                      password: passwordController!.text,
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
+                controller: emailController,
+                style: const TextStyle(color: Colors.white),
+              ),
+              TextField(
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
+                controller: passwordController,
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(
+                height: 15.0,
+              ),
+              BlocConsumer<RegisterBloc, RegisterState>(
+                listener: (context, state) {
+                  if (state is RegisterLoaded) {
+                    nameController!.clear();
+                    emailController!.clear();
+                    passwordController!.clear();
+                    //navigasi
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        backgroundColor: Colors.blue,
+                        content:
+                            Text('succes register with id : ${state.model.id}')));
+                    Navigator.pushNamed(context,LoginPage.routeName);
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  }
+                },
+                builder: (context, state) {
+                  if (state is RegisterLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
                     );
-                    context
-                        .read<RegisterBloc>()
-                        .add(SaveRegisterEvent(request: requestModel));
-                  },
-                  child: const Text('Register'),
-                );
-              },
-            ),
-            const SizedBox(
-              height: 16.0,
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, LoginPage.routeName);
-              },
-              child: const Text('Sudah Punya akun ?'),
-            ),
-          ],
+                  }
+                  return ElevatedButton(
+                    onPressed: () {
+                      final message = validationInput();
+                      if (message != null) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.blue,
+                            content: Text(message),
+                          )
+                          ,
+                        );
+                        return;
+                      }
+                      final requestModel = RegisterModel(
+                        name: nameController!.text,
+                        email: emailController!.text,
+                        password: passwordController!.text,
+                      );
+                      context
+                          .read<RegisterBloc>()
+                          .add(SaveRegisterEvent(request: requestModel));
+                    },
+                    child: const Text(
+                      'Register',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(
+                height: 16.0,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, LoginPage.routeName);
+                },
+                child: const Text(
+                  'Sudah Punya akun ?',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

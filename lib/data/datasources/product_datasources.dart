@@ -24,9 +24,12 @@ class ProductDatasources {
   }
 
   Future<ProductResponseModel> updateProduct(ProductModel model, int id) async {
+    var headers = {'Content-Type': 'application/json'};
     final response = await http.put(
       Uri.parse('https://api.escuelajs.co/api/v1/products/$id'),
-      body: model.toMap(),
+      headers: headers,
+      //body: model.toMap()
+      body: model.toJson(),
     );
 
     return ProductResponseModel.fromJson(response.body);
