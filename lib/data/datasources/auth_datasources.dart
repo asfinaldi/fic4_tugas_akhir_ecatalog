@@ -8,7 +8,7 @@ import 'package:platzi_fake_store_app/data/models/response/register_response_mod
 
 import '../models/request/register_model.dart';
 
-enum LoginFailure { invalidCredentials, error }
+enum LoginFailure { invalidLogin, error }
 
 class AuthDatasource {
   Future<RegisterResponseModel> register(RegisterModel registerModel) async {
@@ -32,7 +32,7 @@ class AuthDatasource {
       if (response.statusCode == 201) {
         return Right(LoginResponseModel.fromJson(response.body));
       } else if (response.statusCode == 401) {
-        return Left(LoginFailure.invalidCredentials.name);
+        return Left(LoginFailure.invalidLogin.name);
       } else {
         return Left(LoginFailure.error.name);
       }
