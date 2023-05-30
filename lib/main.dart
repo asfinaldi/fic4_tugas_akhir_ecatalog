@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Platzi Catalog',
         debugShowCheckedModeBanner: false,
         initialRoute: SplashPage.routeName,
         routes: {
