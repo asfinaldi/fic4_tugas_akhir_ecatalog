@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/create_product/create_product_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/get_all_product/get_all_product_bloc.dart';
+import 'package:platzi_fake_store_app/bloc/product/pagination_product/pagination_product_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/update_product/update_product_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/profile/profile_bloc.dart';
 import 'package:platzi_fake_store_app/data/localsources/auth_local_storage.dart';
 import 'package:platzi_fake_store_app/data/models/request/product_model.dart';
 import 'package:platzi_fake_store_app/data/models/response/product_response_model.dart';
+import 'package:platzi_fake_store_app/presemtation/pages/detail_page.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/login_page.dart';
 import 'package:platzi_fake_store_app/presemtation/widgets/banner_product_widget.dart';
 
@@ -33,12 +35,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     context.read<ProfileBloc>().add(GetProfileEvent());
     context.read<GetAllProductBloc>().add(DoGetAllProductEvent());
+    context.read<PaginationProductBloc>().add(GetPaginationProductEvent());
     super.initState();
   }
 
   @override
   void dispose() {
-    // formUpdateKey.currentState?.dispose();
+    formUpdateKey.currentState?.dispose();
     super.dispose();
   }
 
@@ -140,19 +143,19 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            const BannerProduct(),
-            const SizedBox(
-              height: 15.0,
-            ),
+            //const BannerProduct(),
+            // const SizedBox(
+            //   height: 15.0,
+            // ),
             Expanded(
-              child: BlocBuilder<GetAllProductBloc, GetAllProductState>(
+              child: BlocBuilder<PaginationProductBloc, PaginationProductState>(
                 builder: (context, state) {
-                  if (state is GetAllProductLoading) {
+                  if (state is PaginationProductLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-                  if (state is GetAllProductLoaded) {
+                  if (state is PaginationProductLoaded) {
                     // ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     return ListView.builder(
                       itemCount: state.listProduct.length,
@@ -161,43 +164,53 @@ class _HomePageState extends State<HomePage> {
                         final product =
                             state.listProduct.reversed.toList()[index];
 
-                        return Card(
-                          child: ListTile(
-                            title: Text(
-                              product.title ?? '-',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            subtitle: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.description ?? '-',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.black),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailPage(id: product.id.toString()),
+                                ));
+                          },
+                          child: Card(
+                            child: ListTile(
+                              title: Text(
+                                product.title ?? '-',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
                                 ),
-                                Text(
-                                  "\$${product.price} ",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      color: Colors.red),
-                                )
-                              ],
-                            ),
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                '${product.images![0]}',
                               ),
+                              subtitle: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.description ?? '-',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.black),
+                                  ),
+                                  Text(
+                                    "\$${product.price} ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color: Colors.red),
+                                  )
+                                ],
+                              ),
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  '${product.images![0]}',
+                                ),
+                              ),
+                              trailing: updateProduct(context, product),
                             ),
-                            trailing: updateProduct(context, product),
                           ),
                         );
                       },
@@ -409,8 +422,8 @@ class _HomePageState extends State<HomePage> {
                               'Update: ${state.productResponseModel.id}')));
                       Navigator.pop(context);
                       context
-                          .read<GetAllProductBloc>()
-                          .add(DoGetAllProductEvent());
+                          .read<PaginationProductBloc>()
+                          .add(GetPaginationProductEvent());
                     }
                   },
                   child: BlocBuilder<UpdateProductBloc, UpdateProductState>(

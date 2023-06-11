@@ -53,4 +53,15 @@ class ProductDatasources {
 
     return result;
   }
+
+    Future<List<ProductResponseModel>> getPaginationProduct() async {
+    final response = await http.get(
+      Uri.parse('https://api.escuelajs.co/api/v1/products?offset=0&limit=10'),
+    );
+
+    final result = List<ProductResponseModel>.from(jsonDecode(response.body)
+        .map((x) => ProductResponseModel.fromMap(x))).toList();
+
+    return result;
+  }
 }
