@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:platzi_fake_store_app/bloc/login/login_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/create_product/create_product_bloc.dart';
-import 'package:platzi_fake_store_app/bloc/product/get_all_product/get_all_product_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/get_product_detail/get_product_detail_bloc.dart';
-import 'package:platzi_fake_store_app/bloc/product/pagination_product/pagination_product_bloc.dart';
+import 'package:platzi_fake_store_app/bloc/product/products/products_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/update_product/update_product_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/profile/profile_bloc.dart';
 import 'package:platzi_fake_store_app/data/datasources/auth_datasources.dart';
@@ -48,16 +47,13 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => CreateProductBloc(ProductDatasources()),
         ),
-        BlocProvider(
-          create: (context) => GetAllProductBloc(ProductDatasources()),
-        ),
         BlocProvider<UpdateProductBloc>(
           create: (context) => UpdateProductBloc(ProductDatasources()),
         ),
-        BlocProvider(
-          create: (context) => PaginationProductBloc(ProductDatasources()),
+                BlocProvider(
+          create: (context) => ProductsBloc(ProductDatasources()),
         ),
-          BlocProvider(
+        BlocProvider(
           create: (context) => GetProductDetailBloc(ProductDatasources()),
         ),
       ],
@@ -72,7 +68,8 @@ class _MyAppState extends State<MyApp> {
           SplashPage.routeName: (context) => const SplashPage(),
         },
         theme: ThemeData(
-          appBarTheme: const AppBarTheme(color: Color.fromARGB(255, 81, 81, 146)),
+          appBarTheme:
+              const AppBarTheme(color: Color.fromARGB(255, 81, 81, 146)),
           scaffoldBackgroundColor: Color(0xff13131E),
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/create_product/create_product_bloc.dart';
-import 'package:platzi_fake_store_app/bloc/product/get_all_product/get_all_product_bloc.dart';
-import 'package:platzi_fake_store_app/bloc/product/pagination_product/pagination_product_bloc.dart';
+import 'package:platzi_fake_store_app/bloc/product/products/products_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/product/update_product/update_product_bloc.dart';
 import 'package:platzi_fake_store_app/bloc/profile/profile_bloc.dart';
 import 'package:platzi_fake_store_app/data/localsources/auth_local_storage.dart';
@@ -10,7 +9,6 @@ import 'package:platzi_fake_store_app/data/models/request/product_model.dart';
 import 'package:platzi_fake_store_app/data/models/response/product_response_model.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/detail_page.dart';
 import 'package:platzi_fake_store_app/presemtation/pages/login_page.dart';
-import 'package:platzi_fake_store_app/presemtation/widgets/banner_product_widget.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home-page';
@@ -31,11 +29,18 @@ class _HomePageState extends State<HomePage> {
   TextEditingController priceUpdateController = TextEditingController();
   final formUpdateKey = GlobalKey<FormState>();
 
+  final scrollController = ScrollController();
+
   @override
   void initState() {
     context.read<ProfileBloc>().add(GetProfileEvent());
-    context.read<GetAllProductBloc>().add(DoGetAllProductEvent());
-    context.read<PaginationProductBloc>().add(GetPaginationProductEvent());
+    context.read<ProductsBloc>().add(GetProductsEvent());
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.offset) {
+        context.read<ProductsBloc>().add(NextProductsEvent());
+      }
+    });
     super.initState();
   }
 
@@ -143,26 +148,23 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            //const BannerProduct(),
-            // const SizedBox(
-            //   height: 15.0,
-            // ),
             Expanded(
-              child: BlocBuilder<PaginationProductBloc, PaginationProductState>(
+              child: BlocBuilder<ProductsBloc, ProductsState>(
                 builder: (context, state) {
-                  if (state is PaginationProductLoading) {
+                  if (state is ProductsLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-                  if (state is PaginationProductLoaded) {
+                  if (state is ProductsLoaded) {
+                    debugPrint('Total Data : ${state.data.length}');
                     // ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     return ListView.builder(
-                      itemCount: state.listProduct.length,
+                      controller: scrollController,
+                      itemCount: state.data.length,
                       itemBuilder: (context, index) {
                         // final product = state.listProduct[index];
-                        final product =
-                            state.listProduct.reversed.toList()[index];
+                        final product = state.data.reversed.toList()[index];
 
                         return GestureDetector(
                           onTap: () {
@@ -294,9 +296,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                       Navigator.pop(context);
-                      context
-                          .read<GetAllProductBloc>()
-                          .add(DoGetAllProductEvent());
+                      context.read<ProductsBloc>().add(GetProductsEvent());
                     }
                   },
                   child: BlocBuilder<CreateProductBloc, CreateProductState>(
@@ -421,9 +421,7 @@ class _HomePageState extends State<HomePage> {
                           content: Text(
                               'Update: ${state.productResponseModel.id}')));
                       Navigator.pop(context);
-                      context
-                          .read<PaginationProductBloc>()
-                          .add(GetPaginationProductEvent());
+                      context.read<ProductsBloc>().add(GetProductsEvent());
                     }
                   },
                   child: BlocBuilder<UpdateProductBloc, UpdateProductState>(

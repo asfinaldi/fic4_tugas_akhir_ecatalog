@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:platzi_fake_store_app/data/models/request/product_model.dart';
 import 'package:platzi_fake_store_app/data/models/response/product_response_model.dart';
@@ -54,14 +55,16 @@ class ProductDatasources {
     return result;
   }
 
-    Future<List<ProductResponseModel>> getPaginationProduct() async {
+  Future<Either<String, List<ProductResponseModel>>> getPaginationProduct(
+      {required offset, required limit}) async {
     final response = await http.get(
-      Uri.parse('https://api.escuelajs.co/api/v1/products?offset=0&limit=10'),
+      Uri.parse('https://api.escuelajs.co/api/v1/products?offset=$offset&limit=$limit'),
     );
-
-    final result = List<ProductResponseModel>.from(jsonDecode(response.body)
-        .map((x) => ProductResponseModel.fromMap(x))).toList();
-
-    return result;
+    if (response.statusCode == 200) {
+      return Right(List<ProductResponseModel>.from(jsonDecode(response.body)
+          .map((x) => ProductResponseModel.fromMap(x))).toList());
+    } else {
+      return const Left('get product error');
+    }
   }
 }
